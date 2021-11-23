@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My experiment</title>
+    <script src="jspsych.js"></script>
+    <script src="plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="plugins/jspsych-image-keyboard-response.js"></script>
+    <script src="plugins/jspsych-audio-keyboard-response.js"></script>
+    <script src="plugins/jspsych-preload.js"></script>
+    <link href="css/jspsych.css" rel="stylesheet" type="text/css">
+  </head>
+  <body></body>
+  <script>
+
+    /* create timeline */
+    var timeline = [];
+
+    /* preload media files */
+    var preload = {
+      type: 'preload',
+      auto_preload: true
+    }
+    timeline.push(preload);
+
+    /* define welcome message trial */
+    var welcome = {
+      type: "html-keyboard-response",
+      stimulus: "Welcome to the experiment. Press any key to begin."
+    };
+    timeline.push(welcome);
+
+    /* instructions trial */
+    var instructions = {
+      type: "html-keyboard-response",
+      stimulus: `
+        <p>In this experiment, an image will appear in the center 
+        of the screen for a very brief interval.</p><p> Following this, a sound will play.</p>
+        <p>Please press 'g' when you feel like the sound is just about to make contact with you</p>
+        <p>Press any key to begin.</p>
+      `,
+      post_trial_gap: 2000
+    };
+    timeline.push(instructions);
+
+    /* practice instructions trial */
+    var practice_instructions = {
+      type: "html-keyboard-response",
+      stimulus: `
+        <p>First let's practice</p>
+      `,
+      post_trial_gap: 2000
+    };
+    timeline.push(practice_instructions);
+
+    /* practice feedback */
+    var feedback = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        var feedback_text = "Great!";
+        var last_trial_rt = jsPsych.data.getLastTrialData().values()[0].rt;
+        if (last_trial_rt > 3300){
+          feedback_text = "Too slow"
+        }
+        return feedback_text
+      },
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 3000
+    }
+
+    /* practice stimulus */
+    var practice_image = [
+      { stimulus: "img/Animals_184_h.jpg"},
+      { stimulus: "img/Landscapes_185_v.jpg"}, 
+      { stimulus: "img/Landscapes_105_v.jpg"},
+      { stimulus: "img/People_196_h.jpg"},
+      { stimulus: "img/Landscapes_123_h.jpg"}
+    ];
+
+
+    /* test stimulus */
+    var test_image = [
+      { stimulus: "img/Animals_184_h.jpg"},
+      { stimulus: "img/Landscapes_185_v.jpg"}, 
+      { stimulus: "img/Landscapes_105_v.jpg"},
+      { stimulus: "img/People_196_h.jpg"},
+      { stimulus: "img/Landscapes_123_h.jpg"},
+      { stimulus: "img/People_127_h.jpg"},
+      { stimulus: "img/Faces_282_h.jpg"},
+      { stimulus: "img/Landscapes_120_v.jpg"},
+      { stimulus: "img/Animals_002_v.jpg"},
+      { stimulus: "img/Landscapes_103_v.jpg"}
+    ];
+
+    /* audio stimulus */
+    var test_audio = [
+        { audio_stimulus: "sound/loom_lr.mp3"},
+        { audio_stimulus: "sound/loom_rl.mp3"}
+    ];
+
+    var fixation = {
+      type: 'html-keyboard-response',
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: function(){
+          return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
+      },
+      data: {
+        task: 'fixation'
+      }
+    }
+
+    var prime = {
+      type: "image-keyboard-response",
+      stimulus: jsPsych.timelineVariable('stimulus'),
+      stimulus_width: 400,
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 33,
+    }
+
+    var test = {
+        type: "audio-keyboard-response", 
+        stimulus: function(){
+          return jsPsych.randomization.sampleWithReplacement(['sound/loom_lr.mp3', 'sound/loom_rl.mp3'], 1)[0];
+      },
+        data: {
+            task: 'response',
+        },
+        choices: ['g'],
+    }
+
+      /* Practice trials */
+      var practice = {
+      timeline: [fixation, prime, test, feedback],
+      timeline_variables: practice_image,
+      randomize_order: true,
+    }
+
+    timeline.push(practice);
+
+    /* test instructions */
+    var test_instructions = {
+      type: "html-keyboard-response",
+      stimulus: `
+        <p>Let's hit the actual task</p>
+      `,
+      post_trial_gap: 2000
+    };
+    timeline.push(test_instructions);
+
+    /* test trials */
+    var test_procedure = {
+      timeline: [fixation, prime, test],
+      timeline_variables: test_image,
+      randomize_order: true,
+    }
+
+    timeline.push(test_procedure);
+
+    /* define debrief */
+    var debrief_block = {
+        type: "html-keyboard-response",
+        choices: ['c'],
+        stimulus: function(){
+            var trials = jsPsych.data.get().filter({task: 'response'});
+            var rt = Math.round(trials.select('rt').mean());
+
+            return `<p>Your average response time was ${rt}ms.</p>
+            <p>Press any key to complete the experiment. Thank You!</p>`;
+        }
+    };
+
+    timeline.push(debrief_block);
+
+    /* start the experiment */
+    jsPsych.init({
+      timeline: timeline,
+      on_finish: function(){
+          jsPsych.data.displayData();
+      },
+      default_iti: 250
+    });
+  </script>
+  </html>

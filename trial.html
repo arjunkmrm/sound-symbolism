@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Looming Study</title>
+    <script src="jsPsych/jspsych.js"></script>
+    <script src="jsPsych/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jsPsych/plugins/jspsych-image-keyboard-response.js"></script>
+    <script src="jsPsych/plugins/jspsych-audio-keyboard-response.js"></script>
+    <script src="jsPsych/plugins/jspsych-preload.js"></script>
+    <script src="jatos.js"></script>
+    <link href="jsPsych/css/jspsych.css" rel="stylesheet" type="text/css">
+  </head>
+  <body></body>
+
+<script>
+
+var timeline = [];
+var random = 0;
+
+var welcome = {
+  type: "image-keyboard-response",
+  stimulus: "blue.png",
+  prompt: function() {
+    if (jsPsych.randomization.sampleWithoutReplacement([1, 2], 1)[0] == 1) {
+                    random = 1;
+                    return `<p style="text-align:left;">boba
+                            <span style="float:right;">goga</span></p>`;
+                } else {
+                    random = 2;
+                    return `<p style="text-align:left;">goga
+                            <span style="float:right;">boba</span></p>`;
+                }
+  },
+  choices: ['f', 'j'],
+  data: {
+      task: 'test',
+      condition: 'down'
+  },
+  on_finish: function(data) {
+                var test = 'incongruent';
+                if (data.response == 'f' && random == 1 && data.condition == 'down') {
+                    test = 'congruent';
+                }
+                data.match = test;
+            }
+};
+
+//&& data.key_press == 'f'
+
+/*var trial = {
+            type: 'html-keyboard-response',
+            stimulus: 'bow chika',
+            /*prompt: function() {
+            random = jsPsych.randomization.sampleWithoutReplacement([1, 2], 1)[0];
+                    if(random == 1){
+                        return 'right' + 'left';
+                    }
+                    else{
+                        return 'left' + 'right;'
+                    }
+                },
+            choices: [f, j],
+            data: {
+            task: 'test',
+              response: function(){
+                if(random == 1 && keypress == 'f'){
+                return 'congruent'
+                }
+                else{
+                return 'incongruent'
+                }
+            }
+        },
+};*/
+
+ //`<p style="text-align:left;">right
+                         // <span style="float:right;">left</span></p>`;
+
+                          //random = jsPsych.randomization.sampleWithoutReplacement([1, 2], 1)[0];
+
+timeline.push(welcome);
+
+jsPsych.init({
+        timeline: timeline,
+        on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    })
+
+</script>
+</html>
