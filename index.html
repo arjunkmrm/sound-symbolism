@@ -181,8 +181,7 @@ the context of the experiment */
       task: 'screen' //define task name for saving data
     },
     on_finish: function(data){
-    data.correct = data.response == data.correct_response; //find correct responses
-    //jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+    data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response); //find correct responses
   }
 };
 
@@ -201,7 +200,7 @@ the context of the experiment */
             type: "html-keyboard-response",
             stimulus: function() {
 
-            var last_prac = jsPsych.data.get().filter({task:'screen'}).last(2);
+            var last_prac = jsPsych.data.get().filter({task:'screen'}).last(3);
             n_corr = last_prac.filter({correct: false}).count();
 
             return `<p>You responded correctly on ${n_corr} trials.</p>
@@ -238,7 +237,7 @@ the context of the experiment */
             }
         }
 
-/* Rest block */
+/* Rest block */ //optional - not used currently
     var rest_block = {
       type: "html-keyboard-response",
       stimulus: `
@@ -307,7 +306,7 @@ the context of the experiment */
     }*/
 };
 
-/* Test procedure */
+/* 4. Test block */
 
 //Preload test stimulus
 var preload = {
