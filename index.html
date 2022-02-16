@@ -171,9 +171,9 @@ the context of the experiment */
         },
     ],
     timeline_variables: [//define timeline variables and correct response
-      { sound: "jsPsych/screening/ios.wav", correct: '1'},
-      { sound: "jsPsych/screening/iso.wav", correct: '2'},
-      { sound: "jsPsych/screening/soi.wav", correct: '3'}
+      { sound: "jsPsych/screening/ios.wav", correct_response: '1'},
+      { sound: "jsPsych/screening/iso.wav", correct_response: '2'},
+      { sound: "jsPsych/screening/soi.wav", correct_response: '3'}
     ],
     randomize_order: false, //randomize
     data: {
@@ -201,7 +201,7 @@ the context of the experiment */
             stimulus: function() {
 
             var last_prac = jsPsych.data.get().filter({task:'screen'}).last(3);
-            n_corr = last_prac.filter({correct: false}).count();
+            n_corr = last_prac.filter({correct: true}).count();
 
             return `<p>You responded correctly on ${n_corr} trials.</p>
             <p>Press any key to proceed</p>`;
