@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Looming Study</title>
+    <!-- load required plugins from jspsych library -->
     <script src="jsPsych/jspsych.js"></script>
     <script src="jsPsych/plugins/jspsych-html-keyboard-response.js"></script>
     <script src="jsPsych/plugins/jspsych-image-keyboard-response.js"></script>
@@ -13,13 +14,22 @@
 
   <script>
 
-   /* create timeline */
-    var timeline = [];
-    var repeat_hp = false;
-    var hp_count = 1;
-    var random = 0; //for test procedure
+/* Initialise variables */
 
-var instructions_0 = {
+    var timeline = []; //create empty timeline variable
+    var repeat_hp = false; //for headpone task
+    var hp_count = 1; //for headphone task
+    var random = 0; //for test procedure
+    var n_corr = 3;
+
+/* !NOTE: The whole experiment could be divided into several blocks. The following code follows the same breakdown into
+experimental blocks. The end of the code calls each of the code blocks in the order of the experiment. e.g. Instruction blocks,
+followed by headphone screening, practice trials etc. The start of each code block is labelled appropriately in order and in
+the context of the experiment */
+
+  /* 1. Instruction blocks */
+
+    var instructions_0 = { //Welcome page
             type: 'html-keyboard-response',
             stimulus: `
                 <p style="font-size:25px"><strong>Welcome to the experiment</strong></p>
@@ -28,7 +38,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };
 
-    var instructions_1 = {
+    var instructions_1 = { //Introduction to headphone screening task
             type: 'html-keyboard-response',
             stimulus: `
                 <p style="font-size:25px"><strong>Welcome to the experiment</strong></p>
@@ -40,7 +50,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };
 
-    var instructions_2 = {
+    var instructions_2 = { //Wear your headphones instructions
             type: 'html-keyboard-response',
             stimulus: `
                  <p><img src="earphones.jpg"width="300"></p>
@@ -50,7 +60,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };
     
-    var instructions_3 = {
+    var instructions_3 = { //Headphone volume adjustment prompt
             type: 'html-keyboard-response',
             stimulus: `
                  <p>Please set your earphone/headphone volumes to atleast 15% of the max volume</p>
@@ -60,7 +70,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };
 
-    var instructions_4 = {
+    var instructions_4 = { //Breifing for headphone screening task
             type: 'html-keyboard-response',
             stimulus: `
                  <p style="font-size:25px"><strong>Welcome to the headphone screening task</strong></p>
@@ -72,7 +82,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };    
 
-    var instructions_5 = {
+    var instructions_5 = { //Move to actual experiment instruction
             type: 'html-keyboard-response',
             stimulus: `
                 <p>Now let's move to the actual experiment</p>
@@ -81,7 +91,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };    
         
-    var instructions_6 = {
+    var instructions_6 = { //Instructions for actual experiment
             type: 'html-keyboard-response',
             stimulus: `
                  <p style="font-size:30px"><strong>Instructions</strong></p>
@@ -96,7 +106,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };   
 
-    var instructions_7 = {
+    var instructions_7 = { //Practice trial intro
             type: 'html-keyboard-response',
             stimulus: `
                 <p>First let's do three practice trials</p>
@@ -106,7 +116,7 @@ var instructions_0 = {
             post_trial_gap: 1000
         };   
    
-    var instructions_8 = {
+    var instructions_8 = { //Actual task intro
             type: 'html-keyboard-response',
             stimulus: `
                 <p>Now let's hit the actual task</p>
@@ -115,7 +125,11 @@ var instructions_0 = {
             post_trial_gap: 1000
         };   
 
+  /* End of instructions block */
+
+  /* 2. Headphone screening block */
     
+    //Preload stimulus to prevent lag
     var preload_screen = {
             type: 'preload',
             audio: audio_screen,
@@ -127,24 +141,25 @@ var instructions_0 = {
                         "jsPsych/screening/iso.wav",
                         "jsPsych/screening/soi.wav"
     ]
-
-    /* hp screening test */
+    
+    //Task procedure
     var hp_procedure = {
+    //create timeline for headphone screening task
     timeline: [
-        {
+        {//Ready screen 
             type: 'html-keyboard-response',
             stimulus: '<div style="font-size:25px;">Ready</div>',
             choices: jsPsych.NO_KEYS,
-            trial_duration: 1000
+            trial_duration: 1000 //1000ms duration
         },
-        {
+        {//Play tones for headphone screening task
           type: 'audio-keyboard-response',
           stimulus: jsPsych.timelineVariable('sound'),
           prompt: `<p><img src="volume.png"width="200"></p>`,
           choices: jsPsych.NO_KEYS,
           trial_duration: 4100
         },
-        {
+        {//Ask question: 'Which tone was softest?'
             type: 'html-keyboard-response',
             stimulus: '<div style="font-size:25px;">Which tone was the softest? 1, 2 or 3?</div>',
             data: {
@@ -152,24 +167,26 @@ var instructions_0 = {
             correct: jsPsych.timelineVariable('correct')
         },
           choices: ['1', '2', '3'],
-          post_trial_gap: 1000
+          post_trial_gap: 1000 //1000ms post trial gap
         },
     ],
-    timeline_variables: [
-      { sound: "jsPsych/screening/ios.wav", correct: '3'},
+    timeline_variables: [//define timeline variables and correct response
+      { sound: "jsPsych/screening/ios.wav", correct: '1'},
       { sound: "jsPsych/screening/iso.wav", correct: '2'},
-      { sound: "jsPsych/screening/soi.wav", correct: '1'}
+      { sound: "jsPsych/screening/soi.wav", correct: '3'}
     ],
-    randomize_order: true,
+    randomize_order: false, //randomize
     data: {
       correct_response: jsPsych.timelineVariable('correct'),
-      task: 'screen'
+      task: 'screen' //define task name for saving data
     },
     on_finish: function(data){
-    data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+    data.correct = data.response == data.correct_response; //find correct responses
+    //jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
   }
 };
 
+    //Repeat task message if they don't get all correct
         var repeat_hp_message = {
             type: 'html-keyboard-response',
             stimulus: `
@@ -179,24 +196,25 @@ var instructions_0 = {
                       `
         };
 
+    //Headphone task debrief
         var debrief_hp = {
             type: "html-keyboard-response",
             stimulus: function() {
 
-            var last_prac = jsPsych.data.get().filter({trial_part:'probe'}).last(3);
-            var n_corr = last_prac.filter({correct: true}).count();
+            var last_prac = jsPsych.data.get().filter({task:'screen'}).last(2);
+            n_corr = last_prac.filter({correct: false}).count();
 
             return `<p>You responded correctly on ${n_corr} trials.</p>
             <p>Press any key to proceed</p>`;
   }
 };
-
+    //Condition for repeating headphone screening - !! fix bug in this !!
         var repeat_hp_conditional = {
             timeline: [repeat_hp_message],
             conditional_function: function() {
-              var last_hp = jsPsych.data.get().filter({task:'screen'}).last(3);
-              var n_corr = last_hp.filter({correct: true}).count();
-                if (n_corr < 3 && hp_count < 2) {
+              //var last_hp = jsPsych.data.get().filter({task:'screen'}).last(3); //!! bug location - not counting
+              //n_corr = last_hp.filter({correct: true}).count();
+                if (n_corr < 3 && hp_count == 1) {
                     repeat_hp = true;
                     hp_count = 1 + hp_count;
                     return true;
@@ -207,8 +225,10 @@ var instructions_0 = {
             }
         }
 
+  //Headphone task flow
+
         var instructions_hp_loop = {
-            timeline: [instructions_4, hp_procedure, repeat_hp_conditional],
+            timeline: [instructions_4, hp_procedure, debrief_hp, repeat_hp_conditional],
             loop_function: function() {
                 if (repeat_hp == true) {
                     return true;
@@ -218,7 +238,7 @@ var instructions_0 = {
             }
         }
 
-    /* rest block */
+/* Rest block */
     var rest_block = {
       type: "html-keyboard-response",
       stimulus: `
@@ -228,93 +248,9 @@ var instructions_0 = {
       `,
       trial_duration: 120000
       };
-      
-    var debrief_block = {
-      type: "html-keyboard-response",
-      stimulus: function(){
-      return `
-      <p>You will now be redirected to complete a small post-experiment survey</p>
-      <p style="line-height:5">Press any key to proceed</p>
-      `;
-      }
-    };
 
-    var practice_block = [
-                          'jsPsych/prac/prac1.jpg',
-                          'jsPsych/prac/prac2.jpg',
-                          'jsPsych/prac/prac3.jpg',
-    ];
-
-    var images_block = [
-'jsPsych/img/19_big.jpg',
-'jsPsych/img/05_big.jpg',
-'jsPsych/img/01_big.jpg',
-'jsPsych/img/28_big.jpg',
-'jsPsych/img/11_big.jpg',
-'jsPsych/img/04_big.jpg',
-'jsPsych/img/21_big.jpg',
-'jsPsych/img/36_big.jpg',
-'jsPsych/img/16_big.jpg',
-'jsPsych/img/07_big.jpg',
-'jsPsych/img/30_big.jpg',
-'jsPsych/img/35_big.jpg',
-'jsPsych/img/15_big.jpg',
-'jsPsych/img/29_big.jpg',
-'jsPsych/img/27_big.jpg',
-'jsPsych/img/03_big.jpg',
-'jsPsych/img/10_big.jpg',
-'jsPsych/img/18_big.jpg',
-'jsPsych/img/12_big.jpg',
-'jsPsych/img/25_big.jpg',
-'jsPsych/img/24_big.jpg',
-'jsPsych/img/13_big.jpg',
-'jsPsych/img/14_big.jpg',
-'jsPsych/img/02_big.jpg',
-'jsPsych/img/32_big.jpg',
-'jsPsych/img/33_big.jpg',
-'jsPsych/img/22_big.jpg',
-'jsPsych/img/34_big.jpg',
-'jsPsych/img/06_big.jpg',
-'jsPsych/img/09_big.jpg',
-'jsPsych/img/23_big.jpg',
-'jsPsych/img/26_big.jpg'
-                        ];
-
-    var audio_block = [
-'jsPsych/sound/roar_rev_-10.wav',
-'jsPsych/sound/roar_-20.wav',
-'jsPsych/sound/roar_-10.wav',
-'jsPsych/sound/roar_rev_10.wav',
-'jsPsych/sound/roar_10.wav',
-'jsPsych/sound/roar_-15.wav',
-'jsPsych/sound/roar_rev_-10.wav',
-'jsPsych/sound/roar_rev_5.wav',
-'jsPsych/sound/roar_5.wav',
-'jsPsych/sound/roar_-5.wav',
-'jsPsych/sound/roar_rev_15.wav',
-'jsPsych/sound/roar_rev_5.wav',
-'jsPsych/sound/roar_20.wav',
-'jsPsych/sound/roar_rev_10.wav',
-'jsPsych/sound/roar_rev_-5.wav',
-'jsPsych/sound/roar_-15.wav',
-'jsPsych/sound/roar_10.wav',
-'jsPsych/sound/roar_5.wav',
-'jsPsych/sound/roar_15.wav',
-'jsPsych/sound/roar_rev_-20.wav',
-'jsPsych/sound/roar_rev_-20.wav',
-'jsPsych/sound/roar_15.wav',
-'jsPsych/sound/roar_20.wav',
-'jsPsych/sound/roar_-10.wav',
-'jsPsych/sound/roar_rev_15.wav',
-'jsPsych/sound/roar_rev_20.wav',
-'jsPsych/sound/roar_rev_-15.wav',
-'jsPsych/sound/roar_rev_20.wav',
-'jsPsych/sound/roar_-20.wav',
-'jsPsych/sound/roar_-5.wav',
-'jsPsych/sound/roar_rev_-15.wav',
-'jsPsych/sound/roar_rev_-5.wav'
-    ]
-
+/* 3. Practice block */
+//Preload practice stimulus 
     var practice_preload = {
             type: 'preload',
             images: practice_block,
@@ -323,14 +259,7 @@ var instructions_0 = {
             message: 'Loading media'
     };
 
-    var preload = {
-            type: 'preload',
-            images: images_block,
-            audio: audio_block,
-            show_preload_progress_bar: true,
-            message: 'Loading media'
-        };
-
+//Practice procedure
     var practice_procedure = {
       timeline: [
         {
@@ -378,6 +307,18 @@ var instructions_0 = {
     }*/
 };
 
+/* Test procedure */
+
+//Preload test stimulus
+var preload = {
+            type: 'preload',
+            images: images_block,
+            audio: audio_block,
+            show_preload_progress_bar: true,
+            message: 'Loading media'
+        };
+
+//Test Procedure
     var test_procedure = {
     timeline: [
         {
@@ -385,7 +326,7 @@ var instructions_0 = {
             stimulus: '<div style="font-size:60px;">+</div>',
             choices: jsPsych.NO_KEYS,
             trial_duration: function(){
-            return jsPsych.randomization.sampleWithoutReplacement([500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
+            return jsPsych.randomization.sampleWithoutReplacement([500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0]; //random durations of fixation cross
             },
         },
         {
@@ -473,10 +414,104 @@ var instructions_0 = {
   //randomize_order: true
    sample: {
         type: 'without-replacement',
-        size: 10, // 3 trials, without replacement
+        size: 5, // 10 trials, without replacement for testing
     }
 };
 
+/* Debrief block */
+var debrief_block = {
+      type: "html-keyboard-response",
+      stimulus: function(){
+      return `
+      <p>You will now be redirected to complete a small post-experiment survey</p>
+      <p style="line-height:5">Press any key to proceed</p>
+      `;
+      }
+    };
+
+/* stimulus for experiment */
+
+/* Images stimulus */
+var images_block = [
+'jsPsych/img/19_big.jpg',
+'jsPsych/img/05_big.jpg',
+'jsPsych/img/01_big.jpg',
+'jsPsych/img/28_big.jpg',
+'jsPsych/img/11_big.jpg',
+'jsPsych/img/04_big.jpg',
+'jsPsych/img/21_big.jpg',
+'jsPsych/img/36_big.jpg',
+'jsPsych/img/16_big.jpg',
+'jsPsych/img/07_big.jpg',
+'jsPsych/img/30_big.jpg',
+'jsPsych/img/35_big.jpg',
+'jsPsych/img/15_big.jpg',
+'jsPsych/img/29_big.jpg',
+'jsPsych/img/27_big.jpg',
+'jsPsych/img/03_big.jpg',
+'jsPsych/img/10_big.jpg',
+'jsPsych/img/18_big.jpg',
+'jsPsych/img/12_big.jpg',
+'jsPsych/img/25_big.jpg',
+'jsPsych/img/24_big.jpg',
+'jsPsych/img/13_big.jpg',
+'jsPsych/img/14_big.jpg',
+'jsPsych/img/02_big.jpg',
+'jsPsych/img/32_big.jpg',
+'jsPsych/img/33_big.jpg',
+'jsPsych/img/22_big.jpg',
+'jsPsych/img/34_big.jpg',
+'jsPsych/img/06_big.jpg',
+'jsPsych/img/09_big.jpg',
+'jsPsych/img/23_big.jpg',
+'jsPsych/img/26_big.jpg'
+                        ];
+
+/* Audio stimulus */
+    var audio_block = [
+'jsPsych/sound/roar_rev_-10.wav',
+'jsPsych/sound/roar_-20.wav',
+'jsPsych/sound/roar_-10.wav',
+'jsPsych/sound/roar_rev_10.wav',
+'jsPsych/sound/roar_10.wav',
+'jsPsych/sound/roar_-15.wav',
+'jsPsych/sound/roar_rev_-10.wav',
+'jsPsych/sound/roar_rev_5.wav',
+'jsPsych/sound/roar_5.wav',
+'jsPsych/sound/roar_-5.wav',
+'jsPsych/sound/roar_rev_15.wav',
+'jsPsych/sound/roar_rev_5.wav',
+'jsPsych/sound/roar_20.wav',
+'jsPsych/sound/roar_rev_10.wav',
+'jsPsych/sound/roar_rev_-5.wav',
+'jsPsych/sound/roar_-15.wav',
+'jsPsych/sound/roar_10.wav',
+'jsPsych/sound/roar_5.wav',
+'jsPsych/sound/roar_15.wav',
+'jsPsych/sound/roar_rev_-20.wav',
+'jsPsych/sound/roar_rev_-20.wav',
+'jsPsych/sound/roar_15.wav',
+'jsPsych/sound/roar_20.wav',
+'jsPsych/sound/roar_-10.wav',
+'jsPsych/sound/roar_rev_15.wav',
+'jsPsych/sound/roar_rev_20.wav',
+'jsPsych/sound/roar_rev_-15.wav',
+'jsPsych/sound/roar_rev_20.wav',
+'jsPsych/sound/roar_-20.wav',
+'jsPsych/sound/roar_-5.wav',
+'jsPsych/sound/roar_rev_-15.wav',
+'jsPsych/sound/roar_rev_-5.wav'
+    ]
+
+/* Practice stimulus */
+var practice_block = [
+'jsPsych/prac/prac1.jpg',
+'jsPsych/prac/prac2.jpg',
+'jsPsych/prac/prac3.jpg',
+    ];
+
+
+/* Flow of the entire experiment */
 
   timeline.push(instructions_0); 
 
