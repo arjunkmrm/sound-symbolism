@@ -16,11 +16,11 @@
 
 /* Initialise variables */
 
-    var timeline = []; //create empty timeline variable
-    var repeat_hp = false; //for headpone task
-    var hp_count = 1; //for headphone task
-    var random = 0; //for test procedure
-    var n_corr = 3;
+    var timeline = []; //create empty master timeline variable
+    var repeat_hp = false; //conditional to repeat headphone screening
+    var hp_count = 1; //number of times headphone screening has been done, initialised with 1
+    var random = 0; //for test procedure - to randomise display of text choice
+    var n_corr = 0; //no. of correct for headphone screening task
 
 /* !NOTE: The whole experiment could be divided into several blocks. The following code follows the same breakdown into
 experimental blocks. The end of the code calls each of the code blocks in the order of the experiment. e.g. Instruction blocks,
@@ -413,7 +413,7 @@ var preload = {
   //randomize_order: true
    sample: {
         type: 'without-replacement',
-        size: 5, // 10 trials, without replacement for testing
+        size: 32, // number of trial (max - 32)
     }
 };
 
